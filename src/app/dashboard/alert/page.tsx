@@ -1,5 +1,5 @@
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { RocketIcon } from "lucide-react";
+import { RocketIcon } from "@radix-ui/react-icons";
 
 export default function Page() {
   return (
@@ -19,7 +19,7 @@ export default function Page() {
           You can add components to your app using the cli.
         </AlertDescription>
       </Alert>
-     
+
       <Alert variant="success">
         <RocketIcon className="h-4 w-4" />
         <AlertTitle>Destructive!</AlertTitle>
