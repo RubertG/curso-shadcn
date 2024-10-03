@@ -23,6 +23,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -35,6 +36,7 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [currentValue, setCurrentValue] = useState("all")
 
   const table = useReactTable({
     data,
@@ -53,15 +55,39 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <div className="flex items-center py-4">
+      <div className="flex items-center justify-between py-4">
         <Input
           placeholder="Filter emails..."
           value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
+          onChange={(event) => {
+            setCurrentValue("all")
+            table.getColumn("status")?.setFilterValue(undefined)
             table.getColumn("email")?.setFilterValue(event.target.value)
-          }
+          }}
           className="max-w-sm"
         />
+
+        <Select
+          value={currentValue}
+          onValueChange={(status) => {
+            setCurrentValue(status)
+            table.getColumn("status")?.setFilterValue(status === "all" ? undefined : status)
+          }}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Status - All" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Status</SelectLabel>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="processing">Processing</SelectItem>
+              <SelectItem value="success">Success</SelectItem>
+              <SelectItem value="failed">Failed</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
       </div>
       <div className="rounded-md border">
         <Table>
