@@ -5,10 +5,12 @@ const config: Config = {
   dictionaries: [names],
 };
 
+export type Status = "pending" | "processing" | "success" | "failed";
+
 export type Payment = {
   id: string;
   amount: number;
-  status: "pending" | "processing" | "success" | "failed";
+  status: Status;
   email: string;
   clientName: string;
 };
