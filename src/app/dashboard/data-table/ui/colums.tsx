@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/ui/badge"
 import { Payment, Status } from "@/data/payments.data"
-import { ColumnDef } from "@tanstack/react-table"
+import { ColumnDef, FilterFn, Row } from "@tanstack/react-table"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -16,24 +16,45 @@ import {
 import { DotsHorizontalIcon } from "@radix-ui/react-icons"
 import { toast } from "sonner"
 import { SortedIcon } from "./sorted-icon"
+import { Checkbox } from "@/components/ui/checkbox"
+
+const myCustomFilterFn: FilterFn<Payment> = (row: Row<Payment>, columnId: string, filterValue: string, addMeta: (meta: any) => void) => {
+  const filterParts = filterValue.split(" ")
+  const rowValues = `${row.original.email} ${row.original.clientName} ${row.original.status}`.toLowerCase()
+
+  const allPasses = filterParts.every((part) => {
+    return rowValues.includes(part.toLowerCase())
+  })
+
+  return allPasses
+}
 
 export const columns: ColumnDef<Payment>[] = [
   {
-    accessorKey: "clientName",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Client name
-          <SortedIcon isSorted={column.getIsSorted()} />
-        </Button>
-      )
-    },
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
   },
   {
     accessorKey: "email",
+    filterFn: myCustomFilterFn,
     header: ({ column }) => {
       return (
         <Button
@@ -47,7 +68,23 @@ export const columns: ColumnDef<Payment>[] = [
     },
   },
   {
+    accessorKey: "clientName",
+    filterFn: myCustomFilterFn,
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Client name
+          <SortedIcon isSorted={column.getIsSorted()} />
+        </Button>
+      )
+    },
+  },
+  {
     accessorKey: "status",
+    filterFn: myCustomFilterFn,
     header: ({ column }) => {
       return (
         <Button

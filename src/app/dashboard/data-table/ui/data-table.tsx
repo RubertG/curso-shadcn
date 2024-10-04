@@ -26,6 +26,7 @@ import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Payment } from "@/data/payments.data"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -40,6 +41,8 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [currentValue, setCurrentValue] = useState("all")
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const [rowSelection, setRowSelection] = useState({})
+  const isDeleteVisible = Object.keys(rowSelection).length > 0
 
   const table = useReactTable({
     data,
@@ -51,18 +54,26 @@ export function DataTable<TData, TValue>({
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
+      rowSelection,
     },
   })
+
+  const handleDelete = () => {
+    const ids = table.getSelectedRowModel().rows.map(row => (row.original as Payment).id)
+
+    console.log(ids)
+  }
 
   return (
     <div>
       <div className="flex items-center justify-between py-4 gap-3 flex-wrap">
         <Input
-          placeholder="Filter emails..."
+          placeholder="Filter by emails, names or status..."
           value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
           onChange={(event) => {
             setCurrentValue("all")
@@ -72,7 +83,7 @@ export function DataTable<TData, TValue>({
           className="max-w-sm"
         />
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <Select
             value={currentValue}
             onValueChange={(status) => {
@@ -80,7 +91,7 @@ export function DataTable<TData, TValue>({
               table.getColumn("status")?.setFilterValue(status === "all" ? undefined : status)
             }}
           >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-[150px]">
               <SelectValue placeholder="Status - All" />
             </SelectTrigger>
             <SelectContent>
@@ -123,6 +134,17 @@ export function DataTable<TData, TValue>({
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
+
+          {
+            isDeleteVisible && (
+              <Button
+                variant="outline"
+                onClick={handleDelete}
+              >
+                Delete
+              </Button>
+            )
+          }
         </div>
       </div>
       <div className="rounded-md border">
@@ -168,25 +190,32 @@ export function DataTable<TData, TValue>({
             )}
           </TableBody>
         </Table>
-
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Next
-        </Button>
+
+      <div className="flex items-center justify-between gap-4 py-4">
+        <div className="flex-1 text-sm text-muted-foreground">
+          {table.getFilteredSelectedRowModel().rows.length} of{" "}
+          {table.getFilteredRowModel().rows.length} row(s) selected.
+        </div>
+
+        <div className="flex items-center justify-end space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Next
+          </Button>
+        </div>
       </div>
     </div>
   )
