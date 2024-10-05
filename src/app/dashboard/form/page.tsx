@@ -21,12 +21,16 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils"
 import { CalendarIcon } from "@radix-ui/react-icons"
 import { Calendar } from "@/components/ui/calendar"
+import { Switch } from "@/components/ui/switch"
 
 const formSchema = z.object({
   username: z.string().min(2).max(10),
   email: z.string().min(1).email({ message: "Please enter a valid email" }),
   gender: z.enum(["male", "female", "other"], { message: "Please select a gender" }),
   dateOfBirth: z.date({ required_error: "Please select a date of birth" }),
+  marketingEmails: z.boolean().default(false).refine((value) => value, {
+    message: "Please accept the marketing emails"
+  }),
 })
 
 export default function Page() {
@@ -168,6 +172,29 @@ export default function Page() {
               </FormItem>
             )}
           />
+
+          <FormField
+            control={form.control}
+            name="marketingEmails"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm col-span-2">
+                <div className="space-y-0.5">
+                  <FormLabel>Marketing emails</FormLabel>
+                  <FormDescription>
+                    Receive emails about new products, features, and more.
+                  </FormDescription>
+                  <FormMessage />
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
           <Button type="submit">Submit</Button>
         </form>
       </Form>
