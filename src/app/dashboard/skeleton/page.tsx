@@ -2,6 +2,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
 const getData = async () => {
   await new Promise((resolve) => setTimeout(resolve, 3000));
 
