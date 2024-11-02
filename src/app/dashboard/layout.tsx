@@ -28,6 +28,7 @@ const links = [
   { name: "data table", href: "data-table" },
   { name: "form", href: "form" },
   { name: "theme", href: "theme" },
+  { name: "sidebar", href: "sidebar" },
 ].sort((a, b) => a.name.localeCompare(b.name));
 
 export default function DashboardLayout({
